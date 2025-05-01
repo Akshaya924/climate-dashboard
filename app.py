@@ -8,18 +8,31 @@ st.set_page_config(page_title="🌿 Sri Lanka Climate Dashboard", layout="wide")
 # --- Load Data ---
 @st.cache_data
 def load_data():
-    df = pd.read_csv("climate-change_lka_cleaned.csv")
+    df = pd.read_csv("climate-change_lka.csv")
     df = df.dropna()  # Drop any rows with missing values
     return df
 
 df = load_data()
 
+# --- Debugging: Check Data Structure ---
+st.write(df.head())  # Display first few rows to ensure data structure is correct
+
 # --- Prepare Data ---
+# Ensure that the first column is for indicators and remaining columns are years
 df = df.rename(columns={df.columns[0]: "Indicator"})  # Rename the first column to 'Indicator'
-df_long = df.melt(id_vars=["Indicator"], var_name="Year", value_name="Value")  # Reshape data to long format
-df_long["Year"] = pd.to_numeric(df_long["Year"], errors="coerce")  # Convert 'Year' to numeric
-df_long["Value"] = pd.to_numeric(df_long["Value"], errors="coerce")  # Convert 'Value' to numeric
-df_long = df_long.dropna()  # Drop any rows with missing values after conversion
+
+# Check if all columns except 'Indicator' are numeric (year columns)
+year_columns = df.columns[1:]  # All columns except the 'Indicator'
+df[year_columns] = df[year_columns].apply(pd.to_numeric, errors="coerce")  # Convert to numeric
+
+# Check for any issues with the year columns
+st.write(df[year_columns].head())  # Display the first few rows of year columns to debug
+
+# Reshape the DataFrame to long format
+df_long = df.melt(id_vars=["Indicator"], var_name="Year", value_name="Value")
+df_long["Year"] = pd.to_numeric(df_long["Year"], errors="coerce")  # Ensure Year is numeric
+df_long["Value"] = pd.to_numeric(df_long["Value"], errors="coerce")  # Ensure Value is numeric
+df_long = df_long.dropna()  # Drop any rows with missing values
 
 # --- Sidebar Filters ---
 st.sidebar.header("🔧 Filters")
@@ -41,20 +54,20 @@ st.markdown(f"Showing data from **{year_range[0]}** to **{year_range[1]}**")
 # --- Introduction Section ---
 st.markdown("### 🌍 Introduction")
 st.markdown("""
-Welcome to the **Sri Lanka Climate Change Dashboard** — a data-driven tool designed to help users explore and understand national environmental indicators from recent decades. 📊
+Welcome to the **Sri Lanka Climate Change Dashboard** — a data-driven tool that allows users to explore and understand the country's environmental indicators over time. 📊
 
-This dashboard enables you to:
+Climate change is one of the most pressing challenges of our time, and the data available can help us make informed decisions. With this dashboard, you can:
 - 🔍 **Filter** climate indicators such as:
   - 🌡️ Greenhouse Gas Emissions  
   - 🌲 Forest Area  
   - ⚡ Energy Use  
   - 💧 Access to Clean Water  
   - ☀️ Renewable Energy Consumption  
-- 📅 **Select a custom year range** (e.g., 2000–2024) to visualize indicator trends over time.
-- 📈 **Analyze key insights** such as max values, recent levels, and averages.
-- 🧾 **View raw data** for deeper analysis or validation.
+- 📅 **Choose a custom year range** (e.g., 2000–2024) to explore the trends over time.
+- 📈 **Analyze insights** such as the latest values, maximum values, and averages.
+- 🧾 **View the raw data** to dive deeper into the numbers and trends.
 
-This project is part of the **5DATA004W – Data Science Project Lifecycle** module and aims to promote awareness and action through clear, interactive climate data storytelling. 🌱
+This project is part of the **5DATA004W – Data Science Project Lifecycle** module and aims to provide a better understanding of climate change in Sri Lanka and its impact on future generations. 🌱
 """)
 
 # --- KPIs ---
@@ -109,6 +122,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
