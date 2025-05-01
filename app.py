@@ -90,28 +90,30 @@ st.markdown("---")
 st.markdown(
     """
     <div style="
-        background-color: #e8f6f3;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 30px;
+        background-color: #1c1c1c;
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 40px;
         text-align: center;
         font-family: 'Segoe UI', sans-serif;
+        color: #f0f0f0;
     ">
-        <h4 style="color: #1c6e4a;">🌿 Sri Lanka Climate Change Dashboard</h4>
-        <p style="font-size: 16px; color: #333;">
+        <h4 style="color: #2ecc71;">🌿 Sri Lanka Climate Change Dashboard</h4>
+        <p style="font-size: 16px;">
             <em>"We do not inherit the Earth from our ancestors, we borrow it from our children."</em><br>
             — Native American Proverb
         </p>
         <p style="font-size: 14px; margin-top: 20px;">
             💡 Created with ❤️ by <strong>Akshaya Sivakumar</strong><br>
             📘 <em>5DATA004W – Data Science Project Lifecycle</em><br>
-            🌐 Powered by <a href="https://streamlit.io" target="_blank" style="color: #1c6e4a; text-decoration: none;">Streamlit</a> |
-            📊 Visuals by <a href="https://plotly.com" target="_blank" style="color: #1c6e4a; text-decoration: none;">Plotly</a>
+            🌐 Powered by <a href="https://streamlit.io" target="_blank" style="color: #2ecc71; text-decoration: none;">Streamlit</a> |
+            📊 Visuals by <a href="https://plotly.com" target="_blank" style="color: #2ecc71; text-decoration: none;">Plotly</a>
         </p>
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
 
 
