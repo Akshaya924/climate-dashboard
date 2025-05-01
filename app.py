@@ -8,7 +8,7 @@ st.set_page_config(page_title="🌿 Sri Lanka Climate Dashboard", layout="wide")
 # --- Load Data ---
 @st.cache_data
 def load_data():
-    df = pd.read_csv("climate-change_lka.csv")
+    df = pd.read_csv("climate-change_lka_cleaned.csv")
     df = df.dropna()  # Drop any rows with missing values
     return df
 
