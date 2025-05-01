@@ -1,6 +1,6 @@
-import streamlit as st # type: ignore
-import pandas as pd # type: ignore
-import plotly.express as px # type: ignore
+import streamlit as st
+import pandas as pd
+import plotly.express as px
 
 # --- Page Configuration ---
 st.set_page_config(page_title="🌿 Sri Lanka Climate Dashboard", layout="wide")
@@ -8,37 +8,37 @@ st.set_page_config(page_title="🌿 Sri Lanka Climate Dashboard", layout="wide")
 # --- Load Data ---
 @st.cache_data
 def load_data():
-    df = pd.read_csv("climate-change_lka_cleaned.csv", header=1)
-    df = df.dropna()
+    df = pd.read_csv("climate-change_lka_cleaned.csv")
+    df = df.dropna()  # Drop any rows with missing values
     return df
 
 df = load_data()
 
 # --- Prepare Data ---
-df = df.rename(columns={df.columns[0]: "Indicator"})
-df_long = df.melt(id_vars=["Indicator"], var_name="Year", value_name="Value")
-df_long["Year"] = pd.to_numeric(df_long["Year"], errors="coerce")
-df_long["Value"] = pd.to_numeric(df_long["Value"], errors="coerce")
-df_long = df_long.dropna()
+df = df.rename(columns={df.columns[0]: "Indicator"})  # Rename the first column to 'Indicator'
+df_long = df.melt(id_vars=["Indicator"], var_name="Year", value_name="Value")  # Reshape data to long format
+df_long["Year"] = pd.to_numeric(df_long["Year"], errors="coerce")  # Convert 'Year' to numeric
+df_long["Value"] = pd.to_numeric(df_long["Value"], errors="coerce")  # Convert 'Value' to numeric
+df_long = df_long.dropna()  # Drop any rows with missing values after conversion
 
 # --- Sidebar Filters ---
 st.sidebar.header("🔧 Filters")
-indicators = sorted(df_long["Indicator"].unique())
-selected_indicator = st.sidebar.selectbox("Select Indicator", indicators)
-min_year = int(df_long["Year"].min())
-max_year = int(df_long["Year"].max())
-year_range = st.sidebar.slider("Select Year Range", min_year, max_year, (2000, max_year))
+indicators = sorted(df_long["Indicator"].unique())  # List of unique indicators
+selected_indicator = st.sidebar.selectbox("Select Indicator", indicators)  # Indicator selection box
+min_year = int(df_long["Year"].min())  # Minimum year
+max_year = int(df_long["Year"].max())  # Maximum year
+year_range = st.sidebar.slider("Select Year Range", min_year, max_year, (2000, max_year))  # Year range slider
 
 # --- Filtered Data ---
 filtered = df_long[(df_long["Indicator"] == selected_indicator) & 
                    (df_long["Year"] >= year_range[0]) & 
-                   (df_long["Year"] <= year_range[1])]
+                   (df_long["Year"] <= year_range[1])]  # Apply filters
 
 # --- Header ---
 st.markdown(f"## 📈 {selected_indicator}")
 st.markdown(f"Showing data from **{year_range[0]}** to **{year_range[1]}**")
 
-# --- Introduction Section with Emojis ---
+# --- Introduction Section ---
 st.markdown("### 🌍 Introduction")
 st.markdown("""
 Welcome to the **Sri Lanka Climate Change Dashboard** — a data-driven tool designed to help users explore and understand national environmental indicators from recent decades. 📊
@@ -58,12 +58,12 @@ This project is part of the **5DATA004W – Data Science Project Lifecycle** mod
 """)
 
 # --- KPIs ---
-latest_year = filtered["Year"].max()
-latest_value = filtered[filtered["Year"] == latest_year]["Value"].values[0]
-average_value = round(filtered["Value"].mean(), 2)
-max_value = filtered["Value"].max()
+latest_year = filtered["Year"].max()  # Get the latest year in the filtered data
+latest_value = filtered[filtered["Year"] == latest_year]["Value"].values[0]  # Get the latest value for that year
+average_value = round(filtered["Value"].mean(), 2)  # Calculate the average value
+max_value = filtered["Value"].max()  # Get the maximum value
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3)  # Create three columns for displaying metrics
 col1.metric("📌 Latest Value", f"{latest_value:,.2f}")
 col2.metric("📈 Max Value", f"{max_value:,.2f}")
 col3.metric("📊 Average", f"{average_value:,.2f}")
@@ -74,13 +74,13 @@ tab1, tab2 = st.tabs(["📉 Trend Chart", "🧾 Raw Data"])
 
 # --- Chart ---
 with tab1:
-    chart = px.area(filtered, x="Year", y="Value", title=f"Trend of {selected_indicator}", color_discrete_sequence=["#2ecc71"])
-    chart.update_layout(xaxis_title="Year", yaxis_title="Value", plot_bgcolor="white")
-    st.plotly_chart(chart, use_container_width=True)
+    chart = px.area(filtered, x="Year", y="Value", title=f"Trend of {selected_indicator}", color_discrete_sequence=["#2ecc71"])  # Plot area chart
+    chart.update_layout(xaxis_title="Year", yaxis_title="Value", plot_bgcolor="white")  # Customize chart layout
+    st.plotly_chart(chart, use_container_width=True)  # Display chart
 
 # --- Table ---
 with tab2:
-    st.dataframe(filtered.reset_index(drop=True), use_container_width=True)
+    st.dataframe(filtered.reset_index(drop=True), use_container_width=True)  # Display filtered data as a table
 
 # --- Enhanced Footer ---
 st.markdown("---")
@@ -99,7 +99,7 @@ st.markdown(
             <em>"We do not inherit the Earth from our ancestors, we borrow it from our children."</em><br>
             — Native American Proverb
         </p>
-        <p style="font-size: 14px; margin-top: 20px;">
+        <p style="font-size: 14px; margin-top: 20px; color: #333;">
             💡 Created with ❤️ by <strong>Akshaya Sivakumar</strong><br>
             📘 <em>5DATA004W – Data Science Project Lifecycle</em><br>
             🌐 Powered by <a href="https://streamlit.io" target="_blank" style="color: #1c6e4a; text-decoration: none;">Streamlit</a> |
@@ -109,6 +109,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
