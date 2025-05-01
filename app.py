@@ -14,54 +14,50 @@ def load_data():
 
 df = load_data()
 
-# --- DEBUG: Show actual column names (optional during testing) ---
-# st.write("DataFrame Columns:", df.columns.tolist())
-
-# --- Rename the first column to 'Indicator' for consistency ---
-df = df.rename(columns={df.columns[0]: "Indicator"})
-
-# --- Reshape data to long format ---
-df_long = df.melt(id_vars=["Indicator"], var_name="Year", value_name="Value")
-df_long["Year"] = pd.to_numeric(df_long["Year"], errors="coerce")
-df_long["Value"] = pd.to_numeric(df_long["Value"], errors="coerce")
-df_long = df_long.dropna()
+# --- Rename columns for easier access ---
+df = df.rename(columns={
+    "Indicator Name": "Indicator",
+    "Value": "Value",
+    "Year": "Year"
+})
 
 # --- Sidebar Filters ---
 st.sidebar.header("🔧 Filters")
-indicators = sorted(df_long["Indicator"].unique())
+indicators = sorted(df["Indicator"].unique())
 selected_indicator = st.sidebar.selectbox("Select Indicator", indicators)
-min_year = int(df_long["Year"].min())
-max_year = int(df_long["Year"].max())
+
+min_year = int(df["Year"].min())
+max_year = int(df["Year"].max())
 year_range = st.sidebar.slider("Select Year Range", min_year, max_year, (2000, max_year))
 
 # --- Filtered Data ---
-filtered = df_long[
-    (df_long["Indicator"] == selected_indicator) &
-    (df_long["Year"] >= year_range[0]) &
-    (df_long["Year"] <= year_range[1])
-]
+filtered = df[
+    (df["Indicator"] == selected_indicator) &
+    (df["Year"] >= year_range[0]) &
+    (df["Year"] <= year_range[1])
+].sort_values(by="Year")
 
 # --- Header ---
 st.markdown(f"## 📈 {selected_indicator}")
 st.markdown(f"Showing data from **{year_range[0]}** to **{year_range[1]}**")
 
-# --- Introduction Section ---
+# --- Introduction Section with Emojis ---
 st.markdown("### 🌍 Introduction")
 st.markdown("""
-Welcome to the **Sri Lanka Climate Change Dashboard** — a data-driven platform that empowers you to explore and visualize climate indicators affecting Sri Lanka. 📊
+Welcome to the **Sri Lanka Climate Change Dashboard** — a data-driven tool designed to help users explore and understand national environmental indicators from recent decades. 📊
 
-This interactive dashboard enables you to:
-- 🔍 **Filter and examine** specific indicators like:
+This dashboard enables you to:
+- 🔍 **Filter** climate indicators such as:
   - 🌡️ Greenhouse Gas Emissions  
   - 🌲 Forest Area  
+  - ⚡ Energy Use  
   - 💧 Access to Clean Water  
-  - ☀️ Renewable Energy Use  
-  - ⚡ Energy Consumption  
-- 📅 **Select a custom year range** to see trends over time.
-- 📈 **Analyze** key insights such as latest, highest, and average values.
-- 🧾 **Review raw data** for transparency and deeper analysis.
+  - ☀️ Renewable Energy Consumption  
+- 📅 **Select a custom year range** (e.g., 2000–2024) to visualize indicator trends over time.
+- 📈 **Analyze key insights** such as max values, recent levels, and averages.
+- 🧾 **View raw data** for deeper analysis or validation.
 
-This project is part of the **5DATA004W – Data Science Project Lifecycle** module. Let's make climate data accessible and actionable. 🌱
+This project is part of the **5DATA004W – Data Science Project Lifecycle** module and aims to promote awareness and action through clear, interactive climate data storytelling. 🌱
 """)
 
 # --- KPIs ---
@@ -75,36 +71,32 @@ col1.metric("📌 Latest Value", f"{latest_value:,.2f}")
 col2.metric("📈 Max Value", f"{max_value:,.2f}")
 col3.metric("📊 Average", f"{average_value:,.2f}")
 
-# --- Tabs for Visualization and Data ---
+# --- Layout Tabs ---
 st.markdown("### 📊 Indicator Trend & Data Table")
 tab1, tab2 = st.tabs(["📉 Trend Chart", "🧾 Raw Data"])
 
-# --- Area Chart ---
+# --- Chart ---
 with tab1:
-    chart = px.area(
-        filtered,
-        x="Year",
-        y="Value",
-        title=f"Trend of {selected_indicator}",
-        color_discrete_sequence=["#2ecc71"]
-    )
-    chart.update_layout(
-        xaxis_title="Year",
-        yaxis_title="Value",
-        plot_bgcolor="white",
-        title_x=0.5
-    )
+    chart = px.area(filtered, x="Year", y="Value", title=f"Trend of {selected_indicator}", color_discrete_sequence=["#2ecc71"])
+    chart.update_layout(xaxis_title="Year", yaxis_title="Value", plot_bgcolor="white")
     st.plotly_chart(chart, use_container_width=True)
 
-# --- Data Table ---
+# --- Table ---
 with tab2:
     st.dataframe(filtered.reset_index(drop=True), use_container_width=True)
 
-# --- Footer ---
+# --- Enhanced Footer ---
 st.markdown("---")
 st.markdown(
     """
-    <div style="background-color: #e8f6f3; padding: 20px; border-radius: 10px; text-align: center;">
+    <div style="
+        background-color: #e8f6f3;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        text-align: center;
+        font-family: 'Segoe UI', sans-serif;
+    ">
         <h4 style="color: #1c6e4a;">🌿 Sri Lanka Climate Change Dashboard</h4>
         <p style="font-size: 16px; color: #333;">
             <em>"We do not inherit the Earth from our ancestors, we borrow it from our children."</em><br>
@@ -113,13 +105,14 @@ st.markdown(
         <p style="font-size: 14px; margin-top: 20px;">
             💡 Created with ❤️ by <strong>Akshaya Sivakumar</strong><br>
             📘 <em>5DATA004W – Data Science Project Lifecycle</em><br>
-            🌐 Powered by <a href="https://streamlit.io" target="_blank" style="color: #1c6e4a;">Streamlit</a> |
-            📊 Visuals by <a href="https://plotly.com" target="_blank" style="color: #1c6e4a;">Plotly</a>
+            🌐 Powered by <a href="https://streamlit.io" target="_blank" style="color: #1c6e4a; text-decoration: none;">Streamlit</a> |
+            📊 Visuals by <a href="https://plotly.com" target="_blank" style="color: #1c6e4a; text-decoration: none;">Plotly</a>
         </p>
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
 
 
